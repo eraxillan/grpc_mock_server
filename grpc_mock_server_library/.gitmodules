@@ -1,0 +1,10 @@
+[submodule "googleapis"]
+	path = googleapis
+	url = https://github.com/googleapis/googleapis
+[submodule "main"]
+	path = grpc-gateway
+	url = https://github.com/grpc-ecosystem/grpc-gateway
+	branch = main
+[submodule "grpc-gateway"]
+	path = grpc-gateway
+	url = https://github.com/grpc-ecosystem/grpc-gateway

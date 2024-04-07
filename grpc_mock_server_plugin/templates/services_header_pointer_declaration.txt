@@ -1,0 +1,1 @@
+using $PackageRaw2$$Service$ServicePtr = std::unique_ptr<$PackageRaw$::$Service$ServiceImpl>;

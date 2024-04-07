@@ -1,0 +1,76 @@
+::grpc::Status $Service$ServiceImpl::$Method$(
+    ::grpc::ServerContext* context,
+    ::grpc::ServerReader<$Request$>* reader,
+    $Response$* response
+) {
+    std::string method_name = "$Package$$Service$/$Method$";
+    std::string method_display_name = "$Package$$Service$/$Method$ (client streaming)";
+    std::string dataset_name_with_dot = getDatasetName(context);
+    std::string path = dataset_name_with_dot + method_name;
+
+    // 1) Full replace the result message: read JSON text from file specified in `config.xml` in `full` tag
+    if (Config::instance().haveFullPath(path)) {
+        std::string full_path = Config::instance().fullPath(path);
+        std::string full_data = grpc_mock_server::readFile(full_path);
+        auto status_util = google::protobuf::util::JsonStringToMessage(full_data, response);
+        if (status_util.ok()) {
+            SystemLogger->info("{}: full response override succeeded", method_display_name);
+            return fromUtilStatus(status_util);
+        } else {
+            SystemLogger->error("{}: full: unable to read file '{}'", method_display_name, full_path);
+            return grpc::Status(grpc::INTERNAL, "unable to read full file");
+        }
+    }
+    // 2) Partial replace the result message: read DSL program from file specified in `config.xml` in `partial` tag
+    else if (Config::instance().havePartialPath(path)) {
+        std::string partial_path = Config::instance().partialPath(path);
+
+        grpc::ClientContext client_context;
+        std::unique_ptr<::grpc::ClientWriter<$Request$>> writer(m_stub->$Method$(&client_context, response));
+
+        $Request$ request;
+        while (reader->Read(&request)) {
+            std::string request_json = message_as_json(request);
+
+            if (!writer->Write(request)) {
+                // Broken stream
+                SystemLogger->error("{}: partial: unable to write request to stream", method_display_name);
+                break;
+            }
+        }
+        writer->WritesDone();
+
+        auto status = writer->Finish();        
+        if (status.ok()) {
+            evalRequest(*response, partial_path);
+            SystemLogger->info("{}: partial response override succeeded", method_display_name);
+        } else {
+            SystemLogger->info("{}: partial: unable to override failed response", method_display_name);
+        }
+        return status;
+    }
+    // 3) No replace: call the remote server method and forward it's result
+    // TODO: implement offline mode
+    else {
+        grpc::ClientContext client_context;
+        std::unique_ptr<::grpc::ClientWriter<$Request$>> writer(m_stub->$Method$(&client_context, response));
+
+        $Request$ request;
+        while (reader->Read(&request)) {
+            std::string request_json = message_as_json(request);
+            grpcMockServerMethodCallback($UnixTime$, method_display_name, request_json, grpc::Status::OK.error_code(), "");
+
+            if (!writer->Write(request)) {
+                // Broken stream
+                break;
+            }
+        }
+        writer->WritesDone();
+
+        auto status = writer->Finish();
+        std::string response_json = message_as_json(*response);
+        grpcMockServerMethodCallback($UnixTime$, method_display_name, "", status.error_code(), response_json);
+        return status;
+    }
+}
+

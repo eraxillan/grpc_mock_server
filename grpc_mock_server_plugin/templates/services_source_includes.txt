@@ -1,0 +1,1 @@
+#include "$filename_base$.stub.h"

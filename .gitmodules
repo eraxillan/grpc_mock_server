@@ -1,0 +1,13 @@
+[submodule "grpc"]
+	path = grpc
+	url = https://github.com/grpc/grpc
+	branch = v1.51.3
+[submodule "grpc_mock_server_plugin/grpc"]
+	path = grpc_mock_server_plugin/grpc
+	url = https://github.com/grpc/grpc
+[submodule "grpc_mock_server_library/googleapis"]
+	path = grpc_mock_server_library/googleapis
+	url = https://github.com/googleapis/googleapis
+[submodule "grpc_mock_server_library/grpc-gateway"]
+	path = grpc_mock_server_library/grpc-gateway
+	url = https://github.com/grpc-ecosystem/grpc-gateway

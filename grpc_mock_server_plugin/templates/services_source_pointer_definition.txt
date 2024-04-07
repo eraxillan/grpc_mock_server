@@ -1,0 +1,1 @@
+m_$PackageUnderscores$$Service$Service = std::make_unique<$PackageColons$::$Service$ServiceImpl>(channel);

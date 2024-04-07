@@ -1,0 +1,8 @@
+class $Service$ServiceImpl final : public $PackageRaw$::$Service$::Service {
+    std::mutex m_mutex;
+    std::unique_ptr<$PackageRaw$::$Service$::Stub> m_stub;
+
+public:
+    explicit $Service$ServiceImpl(const std::shared_ptr<::grpc::Channel>& channel)
+        : m_stub($PackageRaw$::$Service$::NewStub(channel)) { }
+

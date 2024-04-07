@@ -1,0 +1,20 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "grpc-mock-server-common",
+  "version": "1.0.0",
+  "description": "gRPC mock server",
+  "license": "Apache-2.0",
+  "dependencies": [
+    "argparse",
+    "catch2",
+    "cmakerc",
+    "cpp-peglib",
+    "grpc",
+    "protobuf",
+    "pugixml",
+    "python3",
+    "spdlog",
+    "sqlitecpp",
+    "openssl"
+  ]
+}

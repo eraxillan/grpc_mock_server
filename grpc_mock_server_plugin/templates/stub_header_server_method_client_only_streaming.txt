@@ -1,0 +1,1 @@
+::grpc::Status $Method$(::grpc::ServerContext* context, ::grpc::ServerReader< $Request$>* reader, $Response$* response) override;

@@ -1,0 +1,16 @@
+<root>
+    <remote_host_url name="remote_host"/>
+    <remote_host_port name="123"/>
+    <local_host_port name="456"/>
+    <dataset name="fixed_price_1234">
+        <package name="orderPackage">
+            <service name="orderService">
+                <!-- Получение списка заказов -->
+                <method name="ListOrders" >
+                    <full path="list_orders_response.txt" />
+                    <partial path="list_orders_request.txt" />
+                </method>
+            </service>
+        </package>
+    </dataset>
+</root>

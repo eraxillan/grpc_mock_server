@@ -1,0 +1,14 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "grpc_mock_server_executable",
+  "version": "1.0.0",
+  "description": "gRPC mock server which allow to replace server responses to user-defined ones",
+  "license": "Apache-2.0",
+  "dependencies": [
+    "spdlog",
+    "cmakerc",
+    "argparse",
+    "catch2",
+    "grpc-mock-server-common"
+  ]
+}

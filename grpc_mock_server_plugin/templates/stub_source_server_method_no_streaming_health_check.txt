@@ -1,0 +1,9 @@
+::grpc::Status $Service$ServiceImpl::$Method$(
+    ::grpc::ServerContext* context,
+    const $Request$* request,
+    $Response$* response
+) {
+    grpc::ClientContext clientContext;
+    return m_stub->$Method$(&clientContext, *request, response);
+}
+

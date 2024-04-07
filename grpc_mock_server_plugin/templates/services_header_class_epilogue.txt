@@ -1,0 +1,7 @@
+
+public:
+    explicit GrpcServices(const std::shared_ptr<grpc::Channel>& channel);
+    ~GrpcServices();
+
+    void registerServices(grpc::ServerBuilder& builder);
+};
