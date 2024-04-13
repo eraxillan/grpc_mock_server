@@ -25,27 +25,27 @@ function(android_protobuf_grpc_generate_cpp SRC_FILES HDR_FILES INCLUDE_ROOT)
         list(APPEND ${SRC_FILES} "${GRPC_PROTO_GENS_DIR}/${RELFIL_WE}.grpc.pb.cc")
         list(APPEND ${HDR_FILES} "${GRPC_PROTO_GENS_DIR}/${RELFIL_WE}.grpc.pb.h")
 
-        add_custom_command(
-            OUTPUT
-            "${GRPC_PROTO_GENS_DIR}/${RELFIL_WE}.grpc.pb.cc"
-            "${GRPC_PROTO_GENS_DIR}/${RELFIL_WE}.grpc.pb.h"
-            "${GRPC_PROTO_GENS_DIR}/${RELFIL_WE}.pb.cc"
-            "${GRPC_PROTO_GENS_DIR}/${RELFIL_WE}.pb.h"
-            COMMAND
-            ${PROTOBUF_PROTOC_EXECUTABLE}
-            ARGS
-            --grpc_out=${GRPC_PROTO_GENS_DIR}
-            --cpp_out=${GRPC_PROTO_GENS_DIR}
-            --plugin=protoc-gen-grpc=${GRPC_CPP_PLUGIN_EXECUTABLE}
-            ${PROTOBUF_INCLUDE_PATH}
-            ${REL_FIL}
-            WORKING_DIRECTORY
-            ${CMAKE_CURRENT_SOURCE_DIR}
-            DEPENDS
-            ${PROTOBUF_PROTOC_EXECUTABLE}
-            ${GRPC_CPP_PLUGIN_EXECUTABLE}
-            ${ABS_FIL}
-        )
+        #add_custom_command(
+        #    OUTPUT
+        #    "${GRPC_PROTO_GENS_DIR}/${RELFIL_WE}.grpc.pb.cc"
+        #    "${GRPC_PROTO_GENS_DIR}/${RELFIL_WE}.grpc.pb.h"
+        #    "${GRPC_PROTO_GENS_DIR}/${RELFIL_WE}.pb.cc"
+        #    "${GRPC_PROTO_GENS_DIR}/${RELFIL_WE}.pb.h"
+        #    COMMAND
+        #    ${PROTOBUF_PROTOC_EXECUTABLE}
+        #    ARGS
+        #    --grpc_out=${GRPC_PROTO_GENS_DIR}
+        #    --cpp_out=${GRPC_PROTO_GENS_DIR}
+        #    --plugin=protoc-gen-grpc=${GRPC_CPP_PLUGIN_EXECUTABLE}
+        #    ${PROTOBUF_INCLUDE_PATH}
+        #    ${REL_FIL}
+        #    WORKING_DIRECTORY
+        #    ${CMAKE_CURRENT_SOURCE_DIR}
+        #    DEPENDS
+        #    ${PROTOBUF_PROTOC_EXECUTABLE}
+        #    ${GRPC_CPP_PLUGIN_EXECUTABLE}
+        #    ${ABS_FIL}
+        #)
     endforeach()
 
     set_source_files_properties(${${SRC_FILES}} ${${HDR_FILES}} PROPERTIES GENERATED TRUE)
@@ -108,51 +108,51 @@ function(android_protobuf_grpc_generate_backend_cpp SRC_FILES HDR_FILES STUB_SRC
         -I ${GRPC_GATEWAY_PATH}
     )
 
-    add_custom_command(
-        COMMENT "Google protobuf C++ code generator"
-        OUTPUT
-        ${SRC_FILES}
-        ${HDR_FILES}
-        COMMAND
-        ${PROTOBUF_PROTOC_EXECUTABLE}
-        ARGS
-        --grpc_out=${GRPC_PROTO_GENS_DIR}
-        --cpp_out=${GRPC_PROTO_GENS_DIR}
-        --plugin=protoc-gen-grpc=${GRPC_CPP_PLUGIN_EXECUTABLE}
-        ${PROTOBUF_INCLUDE_PATH}
-        ${_protoc_input_files}
-        WORKING_DIRECTORY
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        DEPENDS
-        ${PROTOBUF_PROTOC_EXECUTABLE}
-        ${GRPC_CPP_PLUGIN_EXECUTABLE}
-        ${_protoc_depends}
-    )
+    #add_custom_command(
+    #    COMMENT "Google protobuf C++ code generator"
+    #    OUTPUT
+    #    ${SRC_FILES}
+    #    ${HDR_FILES}
+    #    COMMAND
+    #    ${PROTOBUF_PROTOC_EXECUTABLE}
+    #    ARGS
+    #    --grpc_out=${GRPC_PROTO_GENS_DIR}
+    #    --cpp_out=${GRPC_PROTO_GENS_DIR}
+    #    --plugin=protoc-gen-grpc=${GRPC_CPP_PLUGIN_EXECUTABLE}
+    #    ${PROTOBUF_INCLUDE_PATH}
+    #    ${_protoc_input_files}
+    #    WORKING_DIRECTORY
+    #    ${CMAKE_CURRENT_SOURCE_DIR}
+    #    DEPENDS
+    #    ${PROTOBUF_PROTOC_EXECUTABLE}
+    #    ${GRPC_CPP_PLUGIN_EXECUTABLE}
+    #    ${_protoc_depends}
+    #)
 
-    add_custom_command(
-        COMMENT "Google protobuf C++ mock server code generator"
-        OUTPUT
-        ${STUB_SRC_FILES}
-        ${STUB_HDR_FILES}
-        ${GRPC_PROTO_GENS_DIR}/services.cc
-        ${GRPC_PROTO_GENS_DIR}/services.h
-        ${GRPC_PROTO_GENS_DIR}/messageWrapper.cc
-        ${GRPC_PROTO_GENS_DIR}/messageWrapper.h
-        ${GRPC_PROTO_GENS_DIR}/logger.cc
-        ${GRPC_PROTO_GENS_DIR}/logger.h
-        COMMAND
-        ${PROTOBUF_PROTOC_EXECUTABLE}
-        ARGS
-        --cpp-mock-server_out=${GRPC_PROTO_GENS_DIR}
-        ${PROTOBUF_INCLUDE_PATH}
-        ${_protoc_input_files}
-        WORKING_DIRECTORY
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        DEPENDS
-        ${PROTOBUF_PROTOC_EXECUTABLE}
-        ${GRPC_CPP_PLUGIN_EXECUTABLE}
-        ${_protoc_depends}
-    )
+    #add_custom_command(
+    #    COMMENT "Google protobuf C++ mock server code generator"
+    #    OUTPUT
+    #    ${STUB_SRC_FILES}
+    #    ${STUB_HDR_FILES}
+    #    ${GRPC_PROTO_GENS_DIR}/services.cc
+    #    ${GRPC_PROTO_GENS_DIR}/services.h
+    #    ${GRPC_PROTO_GENS_DIR}/messageWrapper.cc
+    #    ${GRPC_PROTO_GENS_DIR}/messageWrapper.h
+    #    ${GRPC_PROTO_GENS_DIR}/logger.cc
+    #    ${GRPC_PROTO_GENS_DIR}/logger.h
+    #    COMMAND
+    #    ${PROTOBUF_PROTOC_EXECUTABLE}
+    #    ARGS
+    #    --cpp-mock-server_out=${GRPC_PROTO_GENS_DIR}
+    #    ${PROTOBUF_INCLUDE_PATH}
+    #    ${_protoc_input_files}
+    #    WORKING_DIRECTORY
+    #    ${CMAKE_CURRENT_SOURCE_DIR}
+    #    DEPENDS
+    #    ${PROTOBUF_PROTOC_EXECUTABLE}
+    #    ${GRPC_CPP_PLUGIN_EXECUTABLE}
+    #    ${_protoc_depends}
+    #)
 
     set_source_files_properties(
         ${${SRC_FILES}}

@@ -92,20 +92,6 @@ set(protobuf_MODULE_COMPATIBLE TRUE)
 find_package(Protobuf CONFIG REQUIRED)
 message(STATUS "Using Protobuf ${Protobuf_VERSION}")
 
-##################################################################################################################
-#set(PROTOS
-#    #${CMAKE_CURRENT_SOURCE_DIR}/protos/helloworld.proto
-#    ${GRPC_GATEWAY_PATH}/protoc-gen-openapiv2/options/annotations.proto
-#)
-#
-#set(PROTO_SRC_DIR ${CMAKE_CURRENT_BINARY_DIR}/proto-src)
-#file(MAKE_DIRECTORY ${PROTO_SRC_DIR})
-#include_directories(${PROTO_SRC_DIR})
-#
-#protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_SRC_DIR} ${PROTOS})
-#grpc_generate_cpp(GRPC_SRCS GRPC_HDRS ${PROTO_SRC_DIR} ${PROTOS})
-##################################################################################################################
-
 find_package(spdlog CONFIG REQUIRED)
 message(STATUS "Using spdlog ${spdlog_VERSION}")
 
@@ -123,6 +109,8 @@ endif()
 
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
 message(STATUS "Python interpreter path: ${Python3_EXECUTABLE}")
+
+# Call the Python script for copying protos to build directory and fixing C++-related compilation problems
 set(FIX_SCRIPT_COMMAND "")
 string(JOIN " " FIX_SCRIPT_COMMAND
     ${Python3_EXECUTABLE}
@@ -131,7 +119,19 @@ string(JOIN " " FIX_SCRIPT_COMMAND
     ${GRPC_PROTO_COPY_DIR}
 )
 separate_arguments(FIX_SCRIPT_COMMAND_LIST WINDOWS_COMMAND "${FIX_SCRIPT_COMMAND}")
-# Call the Python script for copying protos to build directory and fixing C++-related compilation problems
+execute_process(COMMAND ${FIX_SCRIPT_COMMAND_LIST})
+
+# Call the Python script for generating gPRC C++ code from proto-files
+set(FIX_SCRIPT_COMMAND "")
+string(JOIN " " FIX_SCRIPT_COMMAND
+    ${Python3_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/generate.py
+    "-spd ${GRPC_PROTO_COPY_DIR}"
+    "-tpd ${GRPC_PROTO_GENS_DIR}"
+    "-bd ${CMAKE_BINARY_DIR}"
+
+)
+separate_arguments(FIX_SCRIPT_COMMAND_LIST WINDOWS_COMMAND "${FIX_SCRIPT_COMMAND}")
 execute_process(COMMAND ${FIX_SCRIPT_COMMAND_LIST})
 
 find_package(SQLiteCpp CONFIG REQUIRED)
