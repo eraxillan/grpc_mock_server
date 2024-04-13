@@ -39,7 +39,7 @@ endif()
 find_package(CMakeRC CONFIG REQUIRED)
 cmrc_add_resource_library(
     grpc_mock_server_common_test_resources
-    ALIAS grpcmockserver::rc
+    ALIAS grpcmockservercommontestresources::rc
     NAMESPACE grpc_mock_server
     "assets/config.xml"
     "assets/point_count_request.txt"
@@ -66,7 +66,7 @@ set(
     protobuf::libprotobuf
     gRPC::grpc++
     pugixml
-    grpcmockserver::rc
+    grpcmockservercommontestresources::rc
     Catch2::Catch2WithMain 
     grpc_mock_server_common
 )

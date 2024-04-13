@@ -104,11 +104,18 @@ void grpcMockServerMethodCallback(
     const std::string& response_json
 );
 
-inline void evalRequest(const google::protobuf::Message& root_message, const std::string& request_file_path) {
+inline void evalRequest(const google::protobuf::Message& root_message, const std::string& request_file_path, const bool from_resources = false) {
     auto rc_fs = cmrc::grpc_mock_server::get_filesystem();
     auto grammar_file = rc_fs.open("assets/request_grammar.txt");
     auto grammar_data = std::string(grammar_file.cbegin(), grammar_file.cend());
-    auto request_data = grpc_mock_server::readFile(request_file_path);
+    std::string request_data;
+    if (from_resources) {
+        auto resource_file = rc_fs.open(request_file_path);
+        request_data = std::string(resource_file.cbegin(), resource_file.cend());
+    }
+    else {
+        request_data = grpc_mock_server::readFile(request_file_path);
+    }
     MessageWrapper::eval(root_message, grammar_data, request_data);
 }
 

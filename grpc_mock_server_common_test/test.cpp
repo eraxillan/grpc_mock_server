@@ -240,11 +240,7 @@ TEST_CASE("evalRequest", "[utils]") {
     message.set_distance(3);
     message.set_elapsed_time(1);
 
-    auto rc_fs = cmrc::grpc_mock_server::get_filesystem();
-    auto request_file = rc_fs.open("assets/point_count_request.txt");
-    auto request_data = std::string(request_file.cbegin(), request_file.cend());
-
-    evalRequest(message, request_data);
+    evalRequest(message, "assets/point_count_request.txt", true);
 
     REQUIRE(message.point_count() == 12345);
 }
