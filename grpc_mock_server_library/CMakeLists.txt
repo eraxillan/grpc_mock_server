@@ -15,7 +15,7 @@ if (NOT DEFINED PROTO_API_PATH)
 endif()
 
 # Supress "-Wdeprecated-declarations" on gcc/clang
-if (LINUX)
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
 endif()
 
@@ -95,14 +95,16 @@ message(STATUS "Using Protobuf ${Protobuf_VERSION}")
 find_package(spdlog CONFIG REQUIRED)
 message(STATUS "Using spdlog ${spdlog_VERSION}")
 
-if (WIN32)
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     set(Python3_EXECUTABLE  "${CMAKE_BINARY_DIR}/vcpkg_installed/x64-windows/tools/python3/python.exe")
     set(PROTOBUF_PROTOC_EXECUTABLE "${CMAKE_BINARY_DIR}/vcpkg_installed/x64-windows/tools/protobuf/protoc.exe")
     set(GRPC_CPP_PLUGIN_EXECUTABLE "${CMAKE_BINARY_DIR}/vcpkg_installed/x64-windows/tools/grpc/grpc_cpp_plugin.exe")
-elseif (LINUX)
-    set(Python3_EXECUTABLE  "${CMAKE_BINARY_DIR}/vcpkg_installed/x64-linux/tools/python3/python3")
+    set(GRPC_CPP_CUSTOM_PLUGIN_EXECUTABLE "${CMAKE_SOURCE_DIR}/bin/windows")
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    set(Python3_EXECUTABLE  "${CMAKE_BINARY_DIR}/vcpkg_installed/x64-linux/tools/python3/python3.11")
     set(PROTOBUF_PROTOC_EXECUTABLE "${CMAKE_BINARY_DIR}/vcpkg_installed/x64-linux/tools/protobuf/protoc")
     set(GRPC_CPP_PLUGIN_EXECUTABLE "${CMAKE_BINARY_DIR}/vcpkg_installed/x64-linux/tools/grpc/grpc_cpp_plugin")
+    set(GRPC_CPP_CUSTOM_PLUGIN_EXECUTABLE "${CMAKE_SOURCE_DIR}/bin/linux")
 else()
     message(SEND_ERROR "Only Windows/Linux support is implemented yet")
 endif()
@@ -126,6 +128,7 @@ set(FIX_SCRIPT_COMMAND "")
 string(JOIN " " FIX_SCRIPT_COMMAND
     ${Python3_EXECUTABLE}
     ${CMAKE_CURRENT_SOURCE_DIR}/generate.py
+    "-cpd ${GRPC_CPP_CUSTOM_PLUGIN_EXECUTABLE}"
     "-spd ${GRPC_PROTO_COPY_DIR}"
     "-tpd ${GRPC_PROTO_GENS_DIR}"
     "-bd ${CMAKE_BINARY_DIR}"

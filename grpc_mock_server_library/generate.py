@@ -7,18 +7,15 @@ import glob
 
 
 parser = argparse.ArgumentParser()
+parser.add_argument("-cpd", "--custom-plugin-directory", required=True, help="the custom gPRC plugin binary directory")
 parser.add_argument("-spd", "--source-proto-directory", required=True, help="the source protos directory path")
 parser.add_argument("-tpd", "--temponary-proto-directory", required=True, help="the temponary destination one")
 parser.add_argument("-bd", "--build-directory", required=True, help="program build directory absolute path")
 args = parser.parse_args()
 
-#print("Program directory:", Path(sys.argv[0]).parent)
-#print("Build directory:", args.build_directory)
-#print("Source protos directory:", args.source_proto_directory)
-
 # Add custom plugin to PATH to allow `protoc` to find it
-build_bin_dir = Path(args.build_directory) / "bin"
-os.environ["PATH"] += os.pathsep + build_bin_dir.as_posix()
+os.environ["PATH"] += os.pathsep + args.custom_plugin_directory
+os.environ["LD_PRELOAD"] = (Path(args.custom_plugin_directory) / "libgrpc_mock_server_common.so.1.0.0").as_posix()
 
 CMAKE_BINARY_DIR = args.build_directory
 CMAKE_CURRENT_SOURCE_DIR = Path(sys.argv[0]).parent
@@ -83,10 +80,10 @@ def android_protobuf_grpc_generate_cpp(src_files, hdr_files, include_root, *prot
         # Set the new path in generated directory
         generated_file_without_extension = proto_file_relative_dir / proto_file_without_extension
 
-        src_files_temp.append(f"{GRPC_PROTO_GENS_DIR}\\{generated_file_without_extension}.pb.cc")
-        hdr_files_temp.append(f"{GRPC_PROTO_GENS_DIR}\\{generated_file_without_extension}.pb.h")
-        src_files_temp.append(f"{GRPC_PROTO_GENS_DIR}\\{generated_file_without_extension}.grpc.pb.cc")
-        hdr_files_temp.append(f"{GRPC_PROTO_GENS_DIR}\\{generated_file_without_extension}.grpc.pb.h")
+        src_files_temp.append(f"{GRPC_PROTO_GENS_DIR}/{generated_file_without_extension}.pb.cc")
+        hdr_files_temp.append(f"{GRPC_PROTO_GENS_DIR}/{generated_file_without_extension}.pb.h")
+        src_files_temp.append(f"{GRPC_PROTO_GENS_DIR}/{generated_file_without_extension}.grpc.pb.cc")
+        hdr_files_temp.append(f"{GRPC_PROTO_GENS_DIR}/{generated_file_without_extension}.grpc.pb.h")
         
         proto_relative_files.append(proto_file_relative.as_posix())
 
@@ -101,7 +98,7 @@ def android_protobuf_grpc_generate_cpp(src_files, hdr_files, include_root, *prot
             *proto_relative_files
         ],
         cwd=CMAKE_CURRENT_SOURCE_DIR,
-        shell=True,
+        #shell=True,
         check=True,
         capture_output=True
     )
@@ -144,16 +141,16 @@ def android_protobuf_grpc_generate_backend_cpp(src_files, hdr_files, stub_src_fi
         # Set the new path in generated directory
         generated_file_without_extension = proto_file_relative_dir / proto_file_without_extension
         
-        src_files_temp.append(f"{GRPC_PROTO_GENS_DIR}\\{generated_file_without_extension}.grpc.pb.cc")
-        src_files_temp.append(f"{GRPC_PROTO_GENS_DIR}\\{generated_file_without_extension}.pb.cc")
-        hdr_files_temp.append(f"{GRPC_PROTO_GENS_DIR}\\{generated_file_without_extension}.grpc.pb.h")
-        hdr_files_temp.append(f"{GRPC_PROTO_GENS_DIR}\\{generated_file_without_extension}.pb.h")
-        stub_src_files_temp.append(f"{GRPC_PROTO_GENS_DIR}\\{generated_file_without_extension}.stub.cc")
-        stub_hdr_files_temp.append(f"{GRPC_PROTO_GENS_DIR}\\{generated_file_without_extension}.stub.h")
+        src_files_temp.append(f"{GRPC_PROTO_GENS_DIR}/{generated_file_without_extension}.grpc.pb.cc")
+        src_files_temp.append(f"{GRPC_PROTO_GENS_DIR}/{generated_file_without_extension}.pb.cc")
+        hdr_files_temp.append(f"{GRPC_PROTO_GENS_DIR}/{generated_file_without_extension}.grpc.pb.h")
+        hdr_files_temp.append(f"{GRPC_PROTO_GENS_DIR}/{generated_file_without_extension}.pb.h")
+        stub_src_files_temp.append(f"{GRPC_PROTO_GENS_DIR}/{generated_file_without_extension}.stub.cc")
+        stub_hdr_files_temp.append(f"{GRPC_PROTO_GENS_DIR}/{generated_file_without_extension}.stub.h")
         
         proto_relative_files.append(proto_file_relative.as_posix())
 
-    #print(f"Generate gPRC headers and sources...")
+    print(f"Generate gPRC headers and sources...")
     subprocess.run(
         [
             PROTOBUF_PROTOC_EXECUTABLE,
@@ -164,12 +161,12 @@ def android_protobuf_grpc_generate_backend_cpp(src_files, hdr_files, stub_src_fi
             *proto_relative_files
         ],
         cwd=CMAKE_CURRENT_SOURCE_DIR,
-        shell=True,
+        #shell=True,
         check=True,
         capture_output=True
     )
 
-    #print(f"Generate gPRC stub headers and sources...")
+    print(f"Generate gPRC stub headers and sources...")
     subprocess.run(
         [
             PROTOBUF_PROTOC_EXECUTABLE,
@@ -178,7 +175,7 @@ def android_protobuf_grpc_generate_backend_cpp(src_files, hdr_files, stub_src_fi
             *proto_relative_files
         ],
         cwd=CMAKE_CURRENT_SOURCE_DIR,
-        shell=True,
+        #shell=True,
         check=True,
         capture_output=True
     )
@@ -235,11 +232,11 @@ android_protobuf_grpc_generate_backend_cpp(
 )
 
 # Print all generated headers to stdout
-for header in SWAGGER_PROTO_HDRS + GOOGLE_PROTO_HDRS + BACKEND_PROTO_HDRS + BACKEND_STUB_HDRS:
-    print(header)
+#for header in SWAGGER_PROTO_HDRS + GOOGLE_PROTO_HDRS + BACKEND_PROTO_HDRS + BACKEND_STUB_HDRS:
+#    print(header)
 
 # Print all generated sources to stdout
-for source in SWAGGER_PROTO_SRCS + GOOGLE_PROTO_SRCS + BACKEND_PROTO_SRCS + BACKEND_STUB_SRCS:
-    print(source)
+#for source in SWAGGER_PROTO_SRCS + GOOGLE_PROTO_SRCS + BACKEND_PROTO_SRCS + BACKEND_STUB_SRCS:
+#    print(source)
 
 sys.exit(0)

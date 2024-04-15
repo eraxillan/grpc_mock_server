@@ -28,6 +28,7 @@
 #include <iomanip>
 #include <map>
 #include <cassert>
+#include <optional>
 
 // XML parser
 #include <pugixml.hpp>

@@ -22,6 +22,8 @@
 #ifdef WIN32
 #define SocketType SOCKET
 #else
+typedef unsigned int UINT_PTR;
+typedef UINT_PTR SOCKET;
 #define SocketType int
 #define INVALID_SOCKET  (SOCKET)(~0)
 #endif

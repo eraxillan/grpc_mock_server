@@ -25,6 +25,7 @@
 #include <google/protobuf/message.h>
 
 #include <variant>
+#include <optional>
 
 class GRPC_MOCK_SERVER_LIBRARY_API MessageWrapper {
     static std::string getBooleanValueAsString(

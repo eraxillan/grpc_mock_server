@@ -190,7 +190,8 @@ TEST_CASE("readFile", "[fs_utils]") {
     auto result = grpc_mock_server::readFile("C:\\Windows\\win.ini");
     REQUIRE(result.substr(0, 24) == "; for 16-bit app support");
 #else
-#error "Not implemented yet!"
+    auto result = grpc_mock_server::readFile("/etc/lsb-release");
+    REQUIRE(result.substr(0, 10) == "DISTRIB_ID");
 #endif
 }
 
