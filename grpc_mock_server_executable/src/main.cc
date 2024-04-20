@@ -43,11 +43,11 @@ int main(int argc, char* argv[]) {
     Log log;
 
     // Determine the executable directory
-    std::filesystem::path program_path(argv[0]);
-    auto program_directory = program_path.parent_path();
+    auto program_directory = std::filesystem::current_path();
 
     // Validate the program directory
     assert(std::filesystem::exists(program_directory) && std::filesystem::is_directory(program_directory));
+    SystemLogger->debug("Program directory: '{}'", program_directory.generic_string());
     grpc_mock_server::setAppDirectory(program_directory.generic_string());
 
     argparse::ArgumentParser program("grpc_mock_server_example", "1.0.0");
