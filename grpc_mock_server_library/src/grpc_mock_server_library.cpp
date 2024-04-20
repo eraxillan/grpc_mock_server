@@ -152,8 +152,12 @@ Java_name_eraxillan_mockgrpcserver_service_EndlessService_00024Companion_setLogD
 
 namespace grpc_mock_server {
 
-void setHostAndPort(const std::string &host_url, int port) {
-    BusinessLogic::getInstance().setHostAndPort(host_url, port);
+void setRemoteHostAndPort(const std::string& host_url) {
+    BusinessLogic::getInstance().setRemoteHostAndPort(host_url);
+}
+
+void setLocalPort(int port) {
+    BusinessLogic::getInstance().setLocalPort(port);
 }
 
 void setSslUsage(bool use_ssl) {
@@ -198,9 +202,9 @@ bool healthCheck() {
     );
 }
 
-void startServer(std::function<void()> on_started_callback) {
+void startServer(bool is_offline_mode_enabled, std::function<void()> on_started_callback) {
     //BusinessLogic::getInstance().stopServer();
-    BusinessLogic::getInstance().runServer(on_started_callback);
+    BusinessLogic::getInstance().runServer(is_offline_mode_enabled, on_started_callback);
 }
 
 void stopServer() {

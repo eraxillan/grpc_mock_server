@@ -1,0 +1,2 @@
+# change point_count to 12345
+point_count := 12345

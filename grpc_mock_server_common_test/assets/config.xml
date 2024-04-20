@@ -1,7 +1,8 @@
 <root>
-    <remote_host_url name="remote_host"/>
-    <remote_host_port name="123"/>
-    <local_host_port name="456"/>
+    <remote_host_url value="remote_host"/>
+    <remote_host_port value="123"/>
+    <local_host_port value="456"/>
+    <is_offline_mode_enabled value="true"/>
     <dataset name="fixed_price_1234">
         <package name="orderPackage">
             <service name="orderService">

@@ -78,21 +78,22 @@ Java_name_eraxillan_mockgrpcserver_service_EndlessService_00024Companion_setLogD
 namespace grpc_mock_server {
 
 // Setters
-extern "C" GRPC_MOCK_SERVER_LIBRARY_API void setHostAndPort(const std::string &host_url, int port);
+extern "C" GRPC_MOCK_SERVER_LIBRARY_API void setRemoteHostAndPort(const std::string& host_url);
+extern "C" GRPC_MOCK_SERVER_LIBRARY_API void setLocalPort(int port);
 extern "C" GRPC_MOCK_SERVER_LIBRARY_API void setSslUsage(bool use_ssl);
-extern "C" GRPC_MOCK_SERVER_LIBRARY_API void setRemoteServerCertificate(const std::string &crt_data);
+extern "C" GRPC_MOCK_SERVER_LIBRARY_API void setRemoteServerCertificate(const std::string& crt_data);
 extern "C" GRPC_MOCK_SERVER_LIBRARY_API void setLocalServerCertificate(
     const std::string &server_cert_data,
     const std::string &server_key_data,
     const std::string &ca_cert_data
 );
-extern "C" GRPC_MOCK_SERVER_LIBRARY_API void setAppDirectory(const std::string &app_directory);
-extern "C" GRPC_MOCK_SERVER_LIBRARY_API void setPackagesXmlData(const std::string &packages_xml_data);
+extern "C" GRPC_MOCK_SERVER_LIBRARY_API void setAppDirectory(const std::string& app_directory);
+extern "C" GRPC_MOCK_SERVER_LIBRARY_API void setPackagesXmlData(const std::string& packages_xml_data);
 
 // Actions
 extern "C" GRPC_MOCK_SERVER_LIBRARY_API bool isRemoteServerAvailable();
 extern "C" GRPC_MOCK_SERVER_LIBRARY_API bool healthCheck();
-extern "C" GRPC_MOCK_SERVER_LIBRARY_API void startServer(std::function<void()> on_started_callback);
+extern "C" GRPC_MOCK_SERVER_LIBRARY_API void startServer(bool is_offline_mode_enabled, std::function<void()> on_started_callback);
 extern "C" GRPC_MOCK_SERVER_LIBRARY_API void stopServer();
 
 } // namespace grpc_mock_server

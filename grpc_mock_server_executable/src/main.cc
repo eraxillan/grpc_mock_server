@@ -29,8 +29,18 @@
 
 CMRC_DECLARE(grpc_mock_server);
 
+class Log {
+public:
+    Log() {
+        grpc_mock_server::initLogLibrary();
+    }
+    ~Log() {
+        grpc_mock_server::deinitLogLibrary();
+    }
+};
+
 int main(int argc, char* argv[]) {
-    grpc_mock_server::initLogLibrary();
+    Log log;
 
     // Determine the executable directory
     std::filesystem::path program_path(argv[0]);
@@ -38,6 +48,7 @@ int main(int argc, char* argv[]) {
 
     // Validate the program directory
     assert(std::filesystem::exists(program_directory) && std::filesystem::is_directory(program_directory));
+    grpc_mock_server::setAppDirectory(program_directory.generic_string());
 
     argparse::ArgumentParser program("grpc_mock_server_example", "1.0.0");
     program.add_argument("-c", "--config").required().help("Specify the configuration file");
@@ -46,7 +57,6 @@ int main(int argc, char* argv[]) {
     }
     catch (const std::exception& err) {
         SystemLogger->error("Unable to parse command-line arguments: {}", err.what());
-        grpc_mock_server::deinitLogLibrary();
         return 1;
     }
 
@@ -55,20 +65,54 @@ int main(int argc, char* argv[]) {
     auto config_file_data = grpc_mock_server::readFile(config_file_path);
     if (!Config::instance().parse(config_file_data)) {
         SystemLogger->error("Unable to parse the configuration file '{}'", config_file_path);
-        grpc_mock_server::deinitLogLibrary();
         return 1;
     }
-    SystemLogger->info("REMOTE HOST:PORT={}:{}, LOCAL PORT: {}", Config::instance().remoteHostUrl(), Config::instance().remoteHostPort(), Config::instance().localHostPort());
-    auto remoteHostUrl = Config::instance().remoteHostUrl();
-    auto remoteHostPortStr = std::to_string(Config::instance().remoteHostPort());
-    auto remoteHostUrlAndPort = remoteHostUrl + ":" + remoteHostPortStr;
-    auto localHostPort = Config::instance().localHostPort();
 
-    std::string cert_path = (program_directory / "remote_host.crt").generic_string();
-    if (grpc_mock_server::downloadPemCertificate(remoteHostUrl.data() /*"yandex.ru"*/, remoteHostPortStr.data(), cert_path.data()) < 0) {
-        SystemLogger->error("unable to download PEM certificate from remote host");
-        grpc_mock_server::deinitLogLibrary();
+    // Validate the configuration file
+    if (!Config::instance().haveLocalHostPort()) {
+        SystemLogger->error("local_host_port is absent in configuration file '{}'", config_file_path);
         return 1;
+    }
+    SystemLogger->info("local_host_port={}", Config::instance().localHostPort());
+    if (!Config::instance().isOfflineModeEnabled()) {
+        if (!Config::instance().haveRemoteHostUrl()) {
+            SystemLogger->error("remote_host_url is absent in configuration file '{}'", config_file_path);
+            return 1;
+        }
+        SystemLogger->info("remote_host_url={}", Config::instance().remoteHostUrl());
+        if (!Config::instance().haveRemoteHostPort()) {
+            SystemLogger->error("remote_host_port is absent in configuration file '{}'", config_file_path);
+            return 1;
+        }
+        SystemLogger->info("remote_host_port={}", Config::instance().remoteHostPort());
+    }
+    else {
+        SystemLogger->warn("Offline mode is enabled");
+        SystemLogger->warn("All absent in configuration file functions will return 'not implemented' error");
+    }
+
+    auto localHostPort = Config::instance().localHostPort();
+    grpc_mock_server::setLocalPort(localHostPort);
+    
+    if (!Config::instance().isOfflineModeEnabled()) {
+        auto remoteHostUrl = Config::instance().remoteHostUrl();
+        auto remoteHostPortStr = std::to_string(Config::instance().remoteHostPort());
+        auto remoteHostUrlAndPort = remoteHostUrl + ":" + remoteHostPortStr;
+        grpc_mock_server::setRemoteHostAndPort(remoteHostUrlAndPort);
+
+        std::string cert_path = (program_directory / "remote_host.crt").generic_string();
+        if (grpc_mock_server::downloadPemCertificate(remoteHostUrl.data(), remoteHostPortStr.data(), cert_path.data()) < 0) {
+            SystemLogger->error("unable to download PEM certificate from remote host");
+            return 1;
+        }
+        grpc_mock_server::setSslUsage(true);
+        auto remote_cert_data = grpc_mock_server::readFile(cert_path);
+        grpc_mock_server::setRemoteServerCertificate(remote_cert_data);
+
+        if (!grpc_mock_server::isRemoteServerAvailable()) {
+            SystemLogger->error("Remote server '{}' is not available, maybe network problems and/or VPN is not connected yet?", remoteHostUrlAndPort);
+            return 1;
+        }
     }
 
     // Validate and load embedded resources
@@ -82,33 +126,14 @@ int main(int argc, char* argv[]) {
     auto server_key_data = std::string(server_key_file.cbegin(), server_key_file.cend());
     auto ca_cert_file = rc_fs.open("assets/ca.crt");
     auto ca_cert_data = std::string(ca_cert_file.cbegin(), ca_cert_file.cend());
+    grpc_mock_server::setLocalServerCertificate(server_cert_data, server_key_data, ca_cert_data);
 
     assert(rc_fs.exists("assets/packages.xml") && rc_fs.is_file("assets/packages.xml"));
     auto packages_xml_file = rc_fs.open("assets/packages.xml");
     auto packages_xml_data = std::string(packages_xml_file.cbegin(), packages_xml_file.end());
-
     grpc_mock_server::setPackagesXmlData(packages_xml_data);
 
-    // Setup the gRPC mock server options
-    grpc_mock_server::setHostAndPort(remoteHostUrlAndPort, localHostPort);
-    grpc_mock_server::setSslUsage(true);
-    auto remote_cert_data = grpc_mock_server::readFile(cert_path);
-    grpc_mock_server::setRemoteServerCertificate(remote_cert_data);
-    grpc_mock_server::setLocalServerCertificate(
-        server_cert_data,
-        server_key_data,
-        ca_cert_data
-    );
-    grpc_mock_server::setAppDirectory(program_directory.generic_string());
-
-    // Validate the environment and start the server
-    if (!grpc_mock_server::isRemoteServerAvailable()) {
-        SystemLogger->error("Remote server '{}' is not available, maybe network problems and/or VPN is not connected yet?", remoteHostUrlAndPort);
-        grpc_mock_server::deinitLogLibrary();
-        return 1;
-    }
-
-    grpc_mock_server::startServer([]() {
+    grpc_mock_server::startServer(Config::instance().isOfflineModeEnabled(), []() {
         SystemLogger->info("Press any key to stop the server");
     });
 
@@ -116,6 +141,5 @@ int main(int argc, char* argv[]) {
     std::cin.get();
     grpc_mock_server::stopServer();
 
-    grpc_mock_server::deinitLogLibrary();
     return 0;
 }

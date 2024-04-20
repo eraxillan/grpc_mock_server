@@ -1,0 +1,16 @@
+<root>
+    <remote_host_url name="your-host"/>
+    <remote_host_port name="your-remote-port"/>
+    <local_host_port name="your-local-port"/>
+    <is_offline_mode_enabled value="false"/>
+    <dataset name="example_dataset_name">
+        <package name="grpc_package_name">
+            <service name="grpc_service_name">
+                <method name="grpc_method_name" >
+                    <!-- <full path="path/to/full/response.txt" /> -->
+                    <partial path="path/to/partial/response.txt" />
+                </method>
+            </service>
+        </package>
+    </dataset>
+</root>

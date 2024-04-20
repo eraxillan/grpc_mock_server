@@ -46,6 +46,7 @@ class GRPC_MOCK_SERVER_LIBRARY_API Config {
     std::optional<std::string> m_remote_host_url;
     std::optional<int> m_remote_host_port;
     std::optional<int> m_local_host_port;
+    std::optional<bool> m_is_offline_mode_enabled;
 
 public:
     static Config& instance();
@@ -61,6 +62,7 @@ public:
     int localHostPort() const;
 
     // Mock data
+    bool isOfflineModeEnabled() const;
     bool haveFullPath(const std::string& method_name) const;
     bool havePartialPath(const std::string& method_name) const;
     std::string fullPath(const std::string& method_name) const;
@@ -72,7 +74,8 @@ private:
         MethodDescriptions& methods,
         std::optional<std::string>& remote_host_url,
         std::optional<int>& remote_host_port,
-        std::optional<int>& local_host_port
+        std::optional<int>& local_host_port,
+        std::optional<bool>& is_offline_mode_enabled
     );
 
 private:

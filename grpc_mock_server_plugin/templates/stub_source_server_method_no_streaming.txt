@@ -34,8 +34,11 @@
         }
         return status;
     }
-    // 3) No replace: call the remote server method and forward it's result
-    // TODO: implement offline mode
+    // 3) No replace: just return "not implemented yet" error in case of offline mode enabled
+    else if (Config::instance().isOfflineModeEnabled()) {
+        return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "grpc-mock-server: offline mode enabled, but no full response was specified");
+    }
+    // 4) No replace: call the remote server method and forward it's result in case of offline mode disabled
     else {
         std::string request_json = message_as_json(*request);
         grpc::ClientContext client_context;

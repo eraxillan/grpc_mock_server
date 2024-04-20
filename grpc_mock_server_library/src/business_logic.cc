@@ -223,12 +223,16 @@ void BusinessLogic::setSslUsage(bool use_ssl) {
     m_use_ssl = use_ssl;
 }
 
-void BusinessLogic::setHostAndPort(const std::string &host_url, int port) {
+void BusinessLogic::setRemoteHostAndPort(const std::string &host_url) {
     assert(!host_url.empty());
-    assert(port != -1);
 
     m_host_url = host_url;
-    m_port = port;
+}
+
+void BusinessLogic::setLocalPort(int port) {
+    assert(port != -1);
+
+    m_local_port = port;
 }
 
 std::shared_ptr<grpc::Channel> BusinessLogic::createRemoteChannel() const {
@@ -336,22 +340,29 @@ bool BusinessLogic::healthCheck(const std::shared_ptr<grpc::Channel> &channel) {
     }
 }
 
-void BusinessLogic::runServer(std::function<void()> on_started_callback) {
-    assert(!m_host_url.empty());
-    assert(m_port != -1);
+void BusinessLogic::runServer(bool is_offline_mode_enabled, std::function<void()> on_started_callback) {
+    assert(is_offline_mode_enabled || !m_host_url.empty());
+    assert(m_local_port != -1);
 
     auto server_thread = std::thread([=, this]() {
         const int host_port_buf_size = 1024;
         char host_port[host_port_buf_size] = { 0 };
-        snprintf(host_port, host_port_buf_size, "0.0.0.0:%d", m_port);
+        snprintf(host_port, host_port_buf_size, "0.0.0.0:%d", m_local_port);
 
-        GrpcServices services(createRemoteChannel());
+        std::shared_ptr<grpc::Channel> channel;
+        if (is_offline_mode_enabled) {
+            channel = createLocalChannel();
+        }
+        else {
+            channel = createRemoteChannel();
+        }
+        GrpcServices services(channel);
         grpc::ServerBuilder builder;
 
         // Set the default compression algorithm for the server.
         builder.SetDefaultCompressionAlgorithm(GRPC_COMPRESS_GZIP);
 
-        // Listen on the given address without any authentication mechanism.
+        // Listen on the given address without any authentication mechanism
         builder.AddListeningPort(
             host_port,
             createLocalServerCredentials(
@@ -362,8 +373,8 @@ void BusinessLogic::runServer(std::function<void()> on_started_callback) {
             )
         );
 
-        // Register "service" as the instance through which we'll communicate with
-        // clients. In this case it corresponds to an *synchronous* service.
+        // Register "service" as the instance through which we'll communicate with clients.
+        // In this case it corresponds to an *synchronous* service
         services.registerServices(builder);
 
         // Finally assemble the server
@@ -380,8 +391,9 @@ void BusinessLogic::runServer(std::function<void()> on_started_callback) {
 
         on_started_callback();
 
-        // Wait for the server to shutdown. Note that some other thread must be
-        // responsible for shutting down the server for this call to ever return
+        // Wait for the server to shutdown.
+        // Note that some other thread must be responsible for shutting down the server
+        // for this call to ever return
         m_server->Wait();
 
         m_server.reset(nullptr);

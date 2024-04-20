@@ -2,4 +2,9 @@
 CMakeUserPresets.json
 CMakeLists.txt.user
 out/
+out-linux/
 grpc_mock_server_common/grpc_mock_server_export.h
+config.xml
+grpc_mock_server_executable/assets/packages.xml
+grpc_mock_server_library/assets/packages.xml
+

@@ -213,6 +213,7 @@ TEST_CASE("Config", "[config]") {
         REQUIRE(config.remoteHostUrl() == "remote_host");
         REQUIRE(config.remoteHostPort() == 123);
         REQUIRE(config.localHostPort() == 456);
+        REQUIRE(config.isOfflineModeEnabled());
 
         // Mock data
         REQUIRE(config.haveFullPath("fixed_price_1234.orderPackage.orderService/ListOrders"));

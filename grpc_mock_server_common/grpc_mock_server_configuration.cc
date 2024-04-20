@@ -50,6 +50,10 @@ int Config::localHostPort() const {
     return m_local_host_port.value_or(-1);
 }
 
+bool Config::isOfflineModeEnabled() const {
+    return m_is_offline_mode_enabled.value_or(false);
+}
+
 bool Config::haveFullPath(const std::string& method_name) const {
     if (m_methods.contains(method_name)) {
         return !m_methods.at(method_name).m_full_path.empty();
@@ -79,7 +83,8 @@ bool Config::parseConfigXml(
     MethodDescriptions& methods,
     std::optional<std::string>& remote_host_url,
     std::optional<int>& remote_host_port,
-    std::optional<int>& local_host_port
+    std::optional<int>& local_host_port,
+    std::optional<bool>& is_offline_mode_enabled
 ) {
     std::string full_path;
     std::string partial_path;
@@ -94,14 +99,18 @@ bool Config::parseConfigXml(
     pugi::xpath_node remote_host_node = doc.select_node("/root/remote_host_url");
     pugi::xpath_node remote_port_node = doc.select_node("/root/remote_host_port");
     pugi::xpath_node local_port_node = doc.select_node("/root/local_host_port");
+    pugi::xpath_node is_offline_mode_enabled_node = doc.select_node("/root/is_offline_mode_enabled");
     if (remote_host_node) {
-        remote_host_url = remote_host_node.node().attribute("name").as_string();
+        remote_host_url = remote_host_node.node().attribute("value").as_string();
     }
     if (remote_port_node) {
-        remote_host_port = remote_port_node.node().attribute("name").as_int(-1);
+        remote_host_port = remote_port_node.node().attribute("value").as_int(-1);
     }
     if (local_port_node) {
-        local_host_port = local_port_node.node().attribute("name").as_int(-1);
+        local_host_port = local_port_node.node().attribute("value").as_int(-1);
+    }
+    if (is_offline_mode_enabled_node) {
+        is_offline_mode_enabled = is_offline_mode_enabled_node.node().attribute("value").as_bool();
     }
 
     auto xpath_result_nodes = doc.select_nodes("/root/dataset/package/service/child::node()");
@@ -136,5 +145,5 @@ Config::Config() {
 }
 
 bool Config::parse(const std::string& data) {
-    return parseConfigXml(data, m_methods, m_remote_host_url, m_remote_host_port, m_local_host_port);
+    return parseConfigXml(data, m_methods, m_remote_host_url, m_remote_host_port, m_local_host_port, m_is_offline_mode_enabled);
 }

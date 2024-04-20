@@ -33,7 +33,7 @@ namespace SQLite { class Database; }
 class BusinessLogic {
     bool m_use_ssl = true;
     std::string m_host_url = "";
-    int m_port = -1;
+    int m_local_port = -1;
     std::string m_database_file_path;
     std::string m_packages_xml_data;
     std::unique_ptr<SQLite::Database> m_database;
@@ -68,7 +68,8 @@ public:
         const std::string &response_json
     );
 
-    void setHostAndPort(const std::string &host_url, int port);
+    void setRemoteHostAndPort(const std::string& host_url);
+    void setLocalPort(int port);
     void setSslUsage(bool use_ssl);
     void setRemoteServerCertificateData(const std::string &data);
     void setLocalServerCertificateData(
@@ -83,7 +84,7 @@ public:
     void runServer(JNIEnv* env, jobject obj, jmethodID is_cancelled_mid, int port);
     void stopServer();
 #else
-    void runServer(std::function<void()> on_started_callback);
+    void runServer(bool is_offline_mode_enabled, std::function<void()> on_started_callback);
     void stopServer();
 #endif
 };
