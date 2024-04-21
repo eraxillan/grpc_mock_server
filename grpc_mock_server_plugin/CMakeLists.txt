@@ -111,7 +111,6 @@ target_include_directories(
     ${Protobuf_INCLUDE_DIRS}
     ${CMAKE_CURRENT_BINARY_DIR}
     "grpc"
-    "../grpc_mock_server_common"
 )
 
 target_link_libraries(
@@ -120,5 +119,4 @@ target_link_libraries(
     protobuf::libprotobuf
     protobuf::libprotoc
     gRPC::grpc++
-    grpc_mock_server_common
 )
