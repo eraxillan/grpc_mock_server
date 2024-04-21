@@ -523,9 +523,11 @@ std::vector<MessageWrapper::MessageData> MessageWrapper::getMockDataRequestMessa
     std::vector<MessageWrapper::MessageData> result;
 
     auto* input_message_copy = const_cast<google::protobuf::Message*>(&input_message);
-    std::vector<MessageWrapper::MessageData> current_messages{
-        MessageWrapper::MessageData(input_message_copy, input_message_copy->GetDescriptor(), input_message_copy->GetReflection())
-    };
+    MessageWrapper::MessageData md;
+    md.message = input_message_copy;
+    md.descriptor = input_message_copy->GetDescriptor();
+    md.reflection = input_message_copy->GetReflection();
+    std::vector<MessageWrapper::MessageData> current_messages{md};
 
     for (const auto& current_path_token_raw : request.first) {
         bool is_repeated = current_path_token_raw.ends_with("[]");
@@ -549,13 +551,11 @@ std::vector<MessageWrapper::MessageData> MessageWrapper::getMockDataRequestMessa
                     );
                     auto repeated_message_descriptor = repeated_message->GetDescriptor();
                     auto repeated_message_reflection = repeated_message->GetReflection();
-                    temp_messages.push_back(
-                        MessageWrapper::MessageData(
-                            repeated_message,
-                            repeated_message_descriptor,
-                            repeated_message_reflection
-                        )
-                    );
+                    MessageWrapper::MessageData md;
+                    md.message = repeated_message;
+                    md.descriptor = repeated_message_descriptor;
+                    md.reflection = repeated_message_reflection;
+                    temp_messages.push_back(md);
                 }
             }
             else {
@@ -569,9 +569,11 @@ std::vector<MessageWrapper::MessageData> MessageWrapper::getMockDataRequestMessa
                     );
                     auto temp_message_descriptor = temp_message->GetDescriptor();
                     auto temp_message_reflection = temp_message->GetReflection();
-                    temp_messages.push_back(
-                        MessageWrapper::MessageData(temp_message, temp_message_descriptor, temp_message_reflection)
-                    );
+                    MessageWrapper::MessageData md;
+                    md.message = temp_message;
+                    md.descriptor = temp_message_descriptor;
+                    md.reflection = temp_message_reflection;
+                    temp_messages.push_back(md);
                 }
             }
         }
@@ -721,7 +723,9 @@ auto MessageWrapper::parse(const std::string& grammar, const std::string& progra
 
     parser["enum"] = [](const peg::SemanticValues& vs) {
         auto s = vs.token_to_string();
-        return EnumWrapper(s);
+        EnumWrapper ew;
+        ew.name = s;
+        return ew;
         };
 
     parser.enable_packrat_parsing();

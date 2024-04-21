@@ -135,7 +135,10 @@ bool Config::parseConfigXml(
             partial_path = partial_node.attribute("path").as_string();
         }
 
-        methods[full_method_name] = MethodDescription(full_path, partial_path);
+        MethodDescription md;
+        md.m_full_path = full_path;
+        md.m_partial_path = partial_path;
+        methods[full_method_name] = md;
     }
 
     return !methods.empty();

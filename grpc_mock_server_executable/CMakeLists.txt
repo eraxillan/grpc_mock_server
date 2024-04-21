@@ -1,6 +1,6 @@
 ﻿cmake_minimum_required(VERSION 3.12.0)
-set(CMAKE_VERBOSE_MAKEFILE ON)
-set(VERBOSE)
+#set(CMAKE_VERBOSE_MAKEFILE ON)
+#set(VERBOSE)
 
 if (NOT DEFINED CMAKE_MAKE_PROGRAM)
     message(FATAL_ERROR "CMAKE_MAKE_PROGRAM is not set, aborting")

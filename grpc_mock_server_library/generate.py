@@ -34,6 +34,9 @@ if sys.platform.startswith('win32'):
 elif sys.platform.startswith('linux'):
     PROTOBUF_PROTOC_EXECUTABLE = Path(f"{CMAKE_BINARY_DIR}/vcpkg_installed/x64-linux/tools/protobuf/protoc")
     GRPC_CPP_PLUGIN_EXECUTABLE = Path(f"{CMAKE_BINARY_DIR}/vcpkg_installed/x64-linux/tools/grpc/grpc_cpp_plugin")
+elif sys.platform.startswith('darwin'):
+    PROTOBUF_PROTOC_EXECUTABLE = Path(f"{CMAKE_BINARY_DIR}/vcpkg_installed/arm64-osx/tools/protobuf/protoc")
+    GRPC_CPP_PLUGIN_EXECUTABLE = Path(f"{CMAKE_BINARY_DIR}/vcpkg_installed/arm64-osx/tools/grpc/grpc_cpp_plugin")
 else:
     print("ERROR: Only Windows/Linux support is implemented yet")
     sys.exit(1)
