@@ -6,7 +6,7 @@
 #include <iostream>
 
 #include <google/protobuf/compiler/command_line_interface.h>
-#include <google/protobuf/compiler/cpp/cpp_generator.h>
+#include <google/protobuf/compiler/cpp/generator.h>
 #include <google/protobuf/compiler/code_generator.h>
 #include <google/protobuf/compiler/plugin.h>
 #include <google/protobuf/compiler/parser.h>

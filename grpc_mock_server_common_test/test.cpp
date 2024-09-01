@@ -136,8 +136,8 @@ bool operator==(const grpc::Status& lhs, const grpc::Status& rhs) { return lhs.e
 } // anonymous namespace
 
 TEST_CASE("fromUtilStatus", "[utils]") {
-    using InternalStatusCode = google::protobuf::util::status_internal::StatusCode;
-    using InternalStatus = google::protobuf::util::status_internal::Status;
+    using InternalStatusCode = absl::StatusCode;
+    using InternalStatus = absl::Status;
     using GrpcStatus = grpc::Status;
 
     REQUIRE((fromUtilStatus(InternalStatus(InternalStatusCode::kOk, std::string())) == grpc::Status(grpc::OK, "")));

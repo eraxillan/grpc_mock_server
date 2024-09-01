@@ -119,74 +119,74 @@ inline void evalRequest(const google::protobuf::Message& root_message, const std
     MessageWrapper::eval(root_message, grammar_data, request_data);
 }
 
-inline grpc::Status fromUtilStatus(const google::protobuf::util::status_internal::Status& status) {
+inline grpc::Status fromUtilStatus(const absl::Status& status) {
     grpc::StatusCode code { grpc::UNKNOWN };
     switch (status.code()) {
-        case google::protobuf::util::status_internal::StatusCode::kOk: {
+        case absl::StatusCode::kOk: {
             code = grpc::OK;
             break;
         }
-        case google::protobuf::util::status_internal::StatusCode::kCancelled: {
+        case absl::StatusCode::kCancelled: {
             code = grpc::CANCELLED;
             break;
         }
-        case google::protobuf::util::status_internal::StatusCode::kUnknown: {
+        case absl::StatusCode::kUnknown: {
             code = grpc::UNKNOWN;
             break;
         }
-        case google::protobuf::util::status_internal::StatusCode::kInvalidArgument: {
+        case absl::StatusCode::kInvalidArgument: {
             code = grpc::INVALID_ARGUMENT;
             break;
         }
-        case google::protobuf::util::status_internal::StatusCode::kDeadlineExceeded: {
+        case absl::StatusCode::kDeadlineExceeded: {
             code = grpc::DEADLINE_EXCEEDED;
             break;
         }
-        case google::protobuf::util::status_internal::StatusCode::kNotFound: {
+        case absl::StatusCode::kNotFound: {
             code = grpc::NOT_FOUND;
             break;
         }
-        case google::protobuf::util::status_internal::StatusCode::kAlreadyExists: {
+        case absl::StatusCode::kAlreadyExists: {
             code = grpc::ALREADY_EXISTS;
             break;
         }
-        case google::protobuf::util::status_internal::StatusCode::kPermissionDenied: {
+        case absl::StatusCode::kPermissionDenied: {
             code = grpc::PERMISSION_DENIED;
             break;
         }
-        case google::protobuf::util::status_internal::StatusCode::kUnauthenticated: {
+        case absl::StatusCode::kUnauthenticated: {
             code = grpc::UNAUTHENTICATED;
             break;
         }
-        case google::protobuf::util::status_internal::StatusCode::kResourceExhausted: {
+        case absl::StatusCode::kResourceExhausted: {
             code = grpc::RESOURCE_EXHAUSTED;
             break;
         }
-        case google::protobuf::util::status_internal::StatusCode::kFailedPrecondition: {
+        case absl::StatusCode::kFailedPrecondition: {
             code = grpc::FAILED_PRECONDITION;
             break;
         }
-        case google::protobuf::util::status_internal::StatusCode::kAborted: {
+        case absl::StatusCode::kAborted: {
             code = grpc::ABORTED;
             break;
         }
-        case google::protobuf::util::status_internal::StatusCode::kOutOfRange: {
+        case absl::StatusCode::kOutOfRange: {
             code = grpc::OUT_OF_RANGE;
             break;
         }
-        case google::protobuf::util::status_internal::StatusCode::kUnimplemented: {
+        case absl::StatusCode::kUnimplemented: {
             code = grpc::UNIMPLEMENTED;
             break;
         }
-        case google::protobuf::util::status_internal::StatusCode::kInternal: {
+        case absl::StatusCode::kInternal: {
             code = grpc::INTERNAL;
             break;
         }
-        case google::protobuf::util::status_internal::StatusCode::kUnavailable: {
+        case absl::StatusCode::kUnavailable: {
             code = grpc::UNAVAILABLE;
             break;
         }
-        case google::protobuf::util::status_internal::StatusCode::kDataLoss: {
+        case absl::StatusCode::kDataLoss: {
             code = grpc::DATA_LOSS;
             break;
         }
@@ -195,7 +195,7 @@ inline grpc::Status fromUtilStatus(const google::protobuf::util::status_internal
             break;
         }
     }
-    return grpc::Status(code, status.message().as_string());
+    return grpc::Status(code, std::string(status.message()));
 }
 
 inline std::string getDatasetName(::grpc::ServerContextBase* context) {
